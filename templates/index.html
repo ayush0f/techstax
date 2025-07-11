@@ -1,0 +1,66 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHub Webhook Dashboard</title>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
+      th {
+        background: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📡 GitHub Webhook Activity</h1>
+    <p>Refreshing every 15 seconds...</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Author</th>
+          <th>Action</th>
+          <th>Branch</th>
+          <th>Request ID</th>
+          <th>Time (UTC)</th>
+        </tr>
+      </thead>
+      <tbody id="eventTableBody"></tbody>
+    </table>
+
+    <script>
+      async function loadEvents() {
+        const response = await fetch("/events");
+        const data = await response.json();
+        const tableBody = document.getElementById("eventTableBody");
+        tableBody.innerHTML = ""; // clear old rows
+
+        data.forEach((event) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+          <td>${event.author}</td>
+          <td>${event.action}</td>
+          <td>${event.from_branch}</td>
+          <td>${event.request_id}</td>
+          <td>${new Date(event.timestamp).toLocaleString()}</td>
+        `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      loadEvents();
+      setInterval(loadEvents, 15000); // every 15 seconds
+    </script>
+  </body>
+</html>
